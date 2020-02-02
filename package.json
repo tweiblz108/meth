@@ -1,0 +1,40 @@
+{
+  "name": "meth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "node ./meta.config.js && webpack",
+    "start": "pm2 start ./ecosystem.config.js"
+  },
+  "keywords": [],
+  "author": "tweiblz108",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.7.4",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.0.0",
+    "amqplib": "^0.5.5",
+    "anyproxy": "^4.1.2",
+    "axios": "^0.19.2",
+    "entities": "^2.0.0",
+    "jsdom": "^16.1.0",
+    "koa": "^2.11.0",
+    "moment": "^2.24.0",
+    "parse": "^2.11.0",
+    "parse-dashboard": "^2.0.5",
+    "parse-server": "^3.10.0",
+    "pm2": "^4.2.3",
+    "ramda": "^0.26.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "wpapi": "^1.2.1"
+  }
+}

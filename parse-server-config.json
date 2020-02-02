@@ -1,0 +1,7 @@
+{
+  "appId": "wechat",
+  "masterKey": "tweiblz@1",
+  "appName": "Meth",
+  "cloud": "./src/cloud/main",
+  "databaseURI": "mongodb://localhost:27017/meth"
+}
