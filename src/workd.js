@@ -20,7 +20,7 @@ const MiddleMan = (() => {
             const { message, ack } = messages.pop();
             ack();
             clearInterval(intervalId)
-  
+
             resolve(message);
           }
         }, 1000);
@@ -62,4 +62,4 @@ const main = async () => {
   console.log("😈 start at 5673")
 };
 
-module.exports = main
+main()

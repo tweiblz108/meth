@@ -3,6 +3,16 @@ const WPAPI = require("wpapi");
 const { JSDOM } = require("jsdom");
 const Parse = require("parse/node");
 const config = require('../general-config')
+const categories = require('./categories.json')
+const R = require('ramda')
+
+const winston = require('winston')
+
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.File({ filename: 'wordpress_worker.log' })
+  ]
+})
 
 Parse.initialize(config.appId);
 Parse.serverURL = config.serverURL;
@@ -16,13 +26,21 @@ const Article = Parse.Object.extend("Article");
 /** 内容 */
 const Content = Parse.Object.extend("Content");
 
+/** Wordpress */
+const Post = Parse.Object.extend("Post");
+
 const wp = new WPAPI({
   endpoint: config.endpoint,
   username: config.wpUsername,
   password: config.wpPassword
 });
 
-const feedWordPress = async rawHtml => {
+const feedWordPress = async content => {
+  const rawHtml = content.get('rawHtml')
+  const title = content.get('title')
+  const date_gmt = content.get('publishedAt')
+  const excerpt = content.get("digest")
+
   const document = new JSDOM(rawHtml).window.document;
 
   const jsContent = document.querySelector("#js_content");
@@ -39,18 +57,29 @@ const feedWordPress = async rawHtml => {
         e.setAttribute("referrerpolicy", "no-referrer");
       }
     });
+
+    jsContent.querySelectorAll('iframe').forEach(e => { e.remove() })
+
+    const categoryIds = R.values(categories)
+    const categoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)];
+
+    const { id } = await wp.posts().create({
+      title,
+      date_gmt,
+      excerpt,
+      content: jsContent.outerHTML,
+      status: "publish",
+      categories: [categoryId]
+    });
+
+    const post = new Post()
+    post.set('sn', content.get('sn'))
+    post.set('contentId', content.id)
+    post.set('postId', id)
+    await post.save()
+  } else {
+    logger.info(`ignored ${content.id} ${title}`)
   }
-
-  const activityName = document
-    .querySelector("#activity-name")
-    .innerHTML.trim();
-  const wpContent = jsContent.outerHTML;
-
-  return wp.posts().create({
-    title: activityName,
-    content: wpContent,
-    status: "publish"
-  });
 };
 
 const main = async () => {
@@ -65,18 +94,15 @@ const main = async () => {
     QUEUE_NAME,
     async msg => {
       if (msg) {
+        const id = msg.content.toString();
+
         try {
-          const id = msg.content.toString();
-          console.log(`处理 ${id}`)
           const content = await new Parse.Query(Content).get(id);
+          await feedWordPress(content);
 
-          const rawHtml = content.get("rawHtml");
-
-          await feedWordPress(rawHtml);
-
-          
         } catch (error) {
-          console.error(error);
+          logger.error(error);
+          channel.sendToQueue(QUEUE_NAME, Buffer.from(id))
         } finally {
           channel.ack(msg);
         }

@@ -2,6 +2,21 @@ const amqp = require("amqplib");
 const Parse = require("parse/node");
 const axios = require("axios");
 const config = require('../general-config')
+const winston = require('winston')
+
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.File({ filename: 'content_worker.log' })
+  ]
+})
+
+/** 延时函数 */
+const sleep = sec =>
+  new Promise(resolve =>
+    setTimeout(() => {
+      resolve();
+    }, sec * 1000)
+  );
 
 Parse.initialize(config.appId);
 Parse.serverURL = config.serverURL;
@@ -20,7 +35,7 @@ const main = async () => {
   const connect = await amqp.connect(config.amqpURI);
   const channel = await connect.createChannel();
 
-  await channel.assertQueue(QUEUE_NAME, { durable: true });
+  await channel.assertQueue(QUEUE_NAME, { durable: false });
   await channel.prefetch(1);
 
   channel.consume(
@@ -28,29 +43,48 @@ const main = async () => {
     async msg => {
       if (msg) {
         const id = msg.content.toString();
-        
-        console.log(`处理 ${id} `);
 
-        const article = await new Parse.Query(Article).get(id);
-        const url = article.get("content_url");
-        const sn = article.get("sn");
+        try {
+          const article = await new Parse.Query(Article).get(id);
+          const url = article.get("content_url");
 
-        // @ts-ignore
-        const { data: rawHtml } = await axios.get(url);
+          await sleep(1)
 
-        const contentExist = await new Parse.Query(Content).equalTo("sn", sn).first();
-        
-        if (!contentExist) {
-          const content = new Content();
+          // @ts-ignore
+          const { data: rawHtml } = await axios.get(url, {
+            headers: {
+              'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/605.1.15 (KHTML, like Gecko) MicroMessenger/2.3.27(0x12031b12) MacWechat Chrome/39.0.2171.95 Safari/537.36 NetType/WIFI WindowsWechat"
+            }
+          });
 
-          content.set("rawHtml", rawHtml);
-          content.set("sn", sn);
-          content.set("articleId", id);
+          if (rawHtml.indexOf('global_error_msg') !== -1) {
+            logger.info(`ignore aritcle ${id} due to bad response: ${rawHtml}`)
+            channel.ack(msg)
+          } else if (rawHtml.indexOf('你的访问过于频繁') !== -1) {
+            logger.error(`你的访问过于频繁`)
+            process.exit()
+          } else {
+            const content = new Content();
 
-          await content.save();
+            content.set("rawHtml", rawHtml);
+            content.set("sn", article.get('sn'));
+            content.set("articleId", article.id);
+            content.set('title', article.get('title'))
+            content.set('digest', article.get('digest'))
+            content.set('publishedAt', article.get('publishedAt'))
+
+            await content.save();
+
+            channel.ack(msg);
+          }
+
+
+        } catch (error) {
+          channel.sendToQueue(QUEUE_NAME, Buffer.from(id))
+          channel.ack(msg)
+
+          logger.debug(`an error occuer while process ${id}, retry`)
         }
-
-        channel.ack(msg);
       }
     },
     { noAck: false }

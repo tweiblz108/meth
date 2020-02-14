@@ -4,13 +4,13 @@ const R = require("ramda");
 const meta = {
   appId: "wechat",
   masterKey: "tweiblz@1",
-  wpUsername: "admin",
-  wpPassword: "tweiblz@1",
+  wpUsername: "bot",
+  wpPassword: "TWPOOC9wEr^MTWzAiFsda3xR",
   appName: "Meth",
   serverURL: "http://localhost:1337/parse",
   databaseURI: "mongodb://localhost:27017/meth",
   amqpURI: "amqp://localhost",
-  endpoint: "https://a1.pomometer.com:20003/?rest_route=/"
+  endpoint: "https://www.mewsq.xyz/?rest_route=/"
 };
 
 const configs = {
