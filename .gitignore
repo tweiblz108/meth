@@ -4,3 +4,4 @@ src/rat.bundle.js
 general-config.js
 parse-dashboard-config.json
 parse-server-config.json
+/logs

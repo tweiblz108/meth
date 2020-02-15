@@ -9,7 +9,7 @@ const meta = {
   appName: "Meth",
   serverURL: "http://localhost:1337/parse",
   databaseURI: "mongodb://localhost:27017/meth",
-  amqpURI: "amqp://localhost",
+  amqpURI: "amqp://admin:admin@localhost",
   endpoint: "https://www.mewsq.xyz/?rest_route=/"
 };
 

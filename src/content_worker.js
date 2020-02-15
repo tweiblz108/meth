@@ -35,7 +35,7 @@ const main = async () => {
   const connect = await amqp.connect(config.amqpURI);
   const channel = await connect.createChannel();
 
-  await channel.assertQueue(QUEUE_NAME, { durable: false });
+  await channel.assertQueue(QUEUE_NAME, { durable: true });
   await channel.prefetch(1);
 
   channel.consume(
@@ -48,7 +48,7 @@ const main = async () => {
           const article = await new Parse.Query(Article).get(id);
           const url = article.get("content_url");
 
-          await sleep(1)
+          await sleep(0.2)
 
           // @ts-ignore
           const { data: rawHtml } = await axios.get(url, {
@@ -58,9 +58,10 @@ const main = async () => {
           });
 
           if (rawHtml.indexOf('global_error_msg') !== -1) {
-            logger.info(`ignore aritcle ${id} due to bad response: ${rawHtml}`)
+            logger.info(`ignore aritcle ${id} due to bad response`)
             channel.ack(msg)
           } else if (rawHtml.indexOf('你的访问过于频繁') !== -1) {
+            console.log('你的访问过于频繁')
             logger.error(`你的访问过于频繁`)
             process.exit()
           } else {
