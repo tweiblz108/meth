@@ -1,0 +1,1 @@
+ssh -NT -L 27017:localhost:27017 -L 5672:localhost:5672 -L 15672:localhost:15672 -R 1337:localhost:1337 bitnami@ssh.mewsq.xyz

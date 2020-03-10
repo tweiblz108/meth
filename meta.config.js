@@ -2,15 +2,15 @@ const fs = require("fs");
 const R = require("ramda");
 
 const meta = {
-  appId: "wechat",
-  masterKey: "tweiblz@1",
-  wpUsername: "bot",
-  wpPassword: "TWPOOC9wEr^MTWzAiFsda3xR",
-  appName: "Meth",
+  appId: "MegaRaptor",
+  masterKey: "tweiblz108",
+  wpUsername: "admin",
+  wpPassword: "YN9GA80YP*nu9(AYmeZyy#Qz",
+  appName: "MegaRaptor",
   serverURL: "http://localhost:1337/parse",
-  databaseURI: "mongodb://localhost:27017/meth",
-  amqpURI: "amqp://admin:admin@localhost",
-  endpoint: "https://www.mewsq.xyz/?rest_route=/"
+  databaseURI: "mongodb://localhost:27017/megaraptor",
+  amqpURI: "amqp://localhost",
+  endpoint: "https://www.mewsq.xyz/wp-json/"
 };
 
 const configs = {

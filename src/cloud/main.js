@@ -41,7 +41,7 @@ const main = async () => {
       new Parse.Query(Account).lessThanOrEqualTo(
         "visitedAt",
         moment()
-          .subtract(7, "day")
+          .subtract(2, "day")
           .toDate()
       )
       // @ts-ignore

@@ -73,6 +73,7 @@ const main = async () => {
             content.set('title', article.get('title'))
             content.set('digest', article.get('digest'))
             content.set('publishedAt', article.get('publishedAt'))
+            content.set('category', article.get('category'))
 
             await content.save();
 

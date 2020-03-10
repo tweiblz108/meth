@@ -8,6 +8,14 @@ const R = require('ramda')
 
 const winston = require('winston')
 
+/** 延时函数 */
+const sleep = sec =>
+  new Promise(resolve =>
+    setTimeout(() => {
+      resolve();
+    }, sec * 1000)
+  );
+
 const logger = winston.createLogger({
   transports: [
     new winston.transports.File({ filename: 'wordpress_worker.log' })
@@ -40,6 +48,7 @@ const feedWordPress = async content => {
   const title = content.get('title')
   const date_gmt = content.get('publishedAt')
   const excerpt = content.get("digest")
+  const category = content.get('category')
 
   const document = new JSDOM(rawHtml).window.document;
 
@@ -60,8 +69,19 @@ const feedWordPress = async content => {
 
     jsContent.querySelectorAll('iframe').forEach(e => { e.remove() })
 
-    const categoryIds = R.values(categories)
-    const categoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)];
+    const categoryId = R.call(() => {
+      if (R.isEmpty(category)) {
+        return 1 // 未分类
+      } else {
+        const id = categories[category]
+
+        if (R.isNil(id)) {
+          return 1 // 未分类
+        } else {
+          return id
+        }
+      }
+    })
 
     const { id } = await wp.posts().create({
       title,

@@ -29,14 +29,14 @@ const rule = {
       // 所有对  https://rat.rat/ 的请求全部重定向到 ratServer
       if (hostname === "rat.rat") {
         requestDetail.protocol = 'http'
-        
+
         requestDetail.requestOptions.hostname = 'localhost'
         requestDetail.requestOptions.port = '1337'
 
         return requestDetail
       } else if (hostname === 'next.job') {
         requestDetail.protocol = 'http'
-        
+
         requestDetail.requestOptions.hostname = '127.0.0.1'
         requestDetail.requestOptions.port = 5673
 
@@ -69,7 +69,7 @@ const rule = {
       response.body += `<script defer type="text/javascript" src="${RAT_SCRIPT_URL}" ></script>\n`;
 
       // 启用微信自带的调试窗口 vConsole
-      // response.header["Set-Cookie"] && response.header["Set-Cookie"].push("vconsole_open=1; Path=/;");
+      response.header["Set-Cookie"] && response.header["Set-Cookie"].push("vconsole_open=1; Path=/;");
 
       return {
         response
@@ -85,7 +85,11 @@ const options = {
   port: 4001,
   rule,
   forceProxyHttps: true,
-  dangerouslyIgnoreUnauthorized: true
+  dangerouslyIgnoreUnauthorized: true,
+  webInterface: {
+    enable: true,
+    webPort: 4002
+  },
 };
 
 // @ts-ignore

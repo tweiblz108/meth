@@ -12,21 +12,21 @@ module.exports = {
       args: '--config parse-dashboard-config.json',
       instances: 1
     },
-    // {
-    //   name: 'Proxy Server',
-    //   script: 'src/server.js',
-    //   instances: 1
-    // },
-    // {
-    //   name: 'Rat Works Distrib Server',
-    //   script: 'src/workd.js',
-    //   instances: 1
-    // },
-    // {
-    //   name: 'Content Worker',
-    //   script: 'src/content_worker.js',
-    //   instances: 2
-    // },
+    {
+      name: 'Proxy Server',
+      script: 'src/server.js',
+      instances: 1
+    },
+    {
+      name: 'Rat Works Distrib Server',
+      script: 'src/workd.js',
+      instances: 1
+    },
+    {
+      name: 'Content Worker',
+      script: 'src/content_worker.js',
+      instances: 2
+    },
     // {
     //   name: 'WordPress Worker',
     //   script: 'src/wordpress_worker.js',
