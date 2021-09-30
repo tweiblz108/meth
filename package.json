@@ -30,7 +30,7 @@
     "moment": "^2.24.0",
     "parse": "^2.11.0",
     "parse-dashboard": "^2.0.5",
-    "parse-server": "^3.10.0",
+    "parse-server": "^4.10.4",
     "pm2": "^4.2.3",
     "ramda": "^0.26.1",
     "react": "^16.12.0",
